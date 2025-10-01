@@ -10,9 +10,9 @@ library(tidyverse)
 ```
 
 ## Problem 1
-Clean data set
+Clean pols data set
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 pols_df = 
   read_csv("data/pols-month.csv") |> 
   janitor::clean_names() |> 
@@ -25,5 +25,22 @@ pols_df =
   mutate(month=month.name[month]) |> 
   mutate(president=if_else(prez_gop==1,"gop","dem")) |> 
   select(-prez_dem,-prez_gop,-day)
+```
+
+clean snv dataset
+
+```{r}
+snv_df =
+  read_csv("data/snp.csv") |> 
+  janitor::clean_names() |> 
+  separate(date,into=c("month","day","year"), sep="/") |> 
+  mutate(
+    year = as.integer(if_else(as.integer(year) > 15, paste0("19", year), paste0("20", year))),
+    month = as.integer(month),
+    day = as.integer(day)
+  ) |> 
+  mutate(month = month.name[month]) |> 
+  select(year, month, close) |> 
+  arrange(year, match(month, month.name))
 ```
 
