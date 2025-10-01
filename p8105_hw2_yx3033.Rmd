@@ -8,6 +8,7 @@ output: github_document
 ```{r}
 library(tidyverse)
 library(dplyr)
+library(readxl)
 ```
 
 ## Problem 1
@@ -78,3 +79,41 @@ The merged dataset combines three original FiveThirtyEight datasets: `pols-month
 
 
 ## Problem 2
+
+```{r}
+mr_trash =
+  read_excel("data/202509 Trash Wheel Collection Data.xlsx",
+             sheet = "Mr. Trash Wheel",
+             skip =1) |> 
+  janitor::clean_names() |> 
+  filter(!is.na(dumpster)) |> 
+  mutate(sports_balls = as.integer(round(sports_balls)))
+
+mr_trash
+```
+
+
+```{r}
+pro_trash = 
+  read_excel("data/202509 Trash Wheel Collection Data.xlsx",
+             sheet = "Professor Trash Wheel",
+             skip = 1) |> 
+  janitor::clean_names() |> 
+  filter(!is.na(dumpster)) |> 
+  mutate(sports_balls = as.integer(round(sports_balls)),
+         trash_wheel = "Professor Trash Wheel")
+
+gwyn_trash = 
+  read_excel("data/202509 Trash Wheel Collection Data.xlsx",
+             sheet = "Gwynns Falls Trash",
+             skip = 1) |> 
+  janitor::clean_names() |> 
+  filter(!is.na(dumpster)) |> 
+  mutate(sports_balls = as.integer(round(sports_balls)),
+         trash_wheel = "Gwynnda")
+```
+
+
+
+
+
