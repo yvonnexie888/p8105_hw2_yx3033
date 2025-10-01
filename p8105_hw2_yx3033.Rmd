@@ -86,8 +86,11 @@ mr_trash =
              sheet = "Mr. Trash Wheel",
              skip =1) |> 
   janitor::clean_names() |> 
+  select(where(~!all(is.na(.)))) |>
   filter(!is.na(dumpster)) |> 
-  mutate(sports_balls = as.integer(round(sports_balls)))
+  mutate(year = as.integer(year),
+         sports_balls = as.integer(round(sports_balls)),
+         trash_wheel = "Mr. Trash Wheel")
 
 mr_trash
 ```
@@ -100,19 +103,21 @@ pro_trash =
              skip = 1) |> 
   janitor::clean_names() |> 
   filter(!is.na(dumpster)) |> 
-  mutate(sports_balls = as.integer(round(sports_balls)),
-         trash_wheel = "Professor Trash Wheel")
+  mutate(trash_wheel = "Professor Trash Wheel")
 
 gwyn_trash = 
   read_excel("data/202509 Trash Wheel Collection Data.xlsx",
-             sheet = "Gwynns Falls Trash",
+             sheet = "Gwynns Falls Trash Wheel",
              skip = 1) |> 
   janitor::clean_names() |> 
   filter(!is.na(dumpster)) |> 
-  mutate(sports_balls = as.integer(round(sports_balls)),
-         trash_wheel = "Gwynnda")
+  mutate(trash_wheel = "Gwynnda")
 ```
 
+combine all three:
+```{r}
+all_trash <- bind_rows(mr_trash, pro_trash, gwyn_trash)
+```
 
 
 
