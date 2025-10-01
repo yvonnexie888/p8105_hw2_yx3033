@@ -7,6 +7,7 @@ output: github_document
 
 ```{r}
 library(tidyverse)
+library(dplyr)
 ```
 
 ## Problem 1
@@ -61,5 +62,14 @@ unemp_df =
   ) |> 
   select(year, month, unemployment)
 unemp_df
+```
+
+join snv into pols and merge in unemployment
+
+```{r}
+merged_df =
+  left_join(pols_df,snv_df, by = c("year", "month")) |> 
+  left_join(unemp_df, by = c("year", "month"))
+merged_df
 ```
 
