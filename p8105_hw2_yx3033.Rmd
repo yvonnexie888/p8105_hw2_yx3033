@@ -5,3 +5,25 @@ Data: 2025-10-01
 output: github_document
 ---
 
+```{r}
+library(tidyverse)
+```
+
+## Problem 1
+Clean data set
+
+```{r}
+pols_df = 
+  read_csv("data/pols-month.csv") |> 
+  janitor::clean_names() |> 
+  separate(mon,into=c("year","month","day")) |> 
+  mutate(
+    year=as.integer(year),
+    month = as.integer(month),
+    day = as.integer(day)
+  ) |> 
+  mutate(month=month.name[month]) |> 
+  mutate(president=if_else(prez_gop==1,"gop","dem")) |> 
+  select(-prez_dem,-prez_gop,-day)
+```
+
