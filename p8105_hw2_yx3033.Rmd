@@ -116,9 +116,10 @@ gwyn_trash =
 
 combine all three:
 ```{r}
-all_trash <- bind_rows(mr_trash, pro_trash, gwyn_trash)
+all_trash <- bind_rows(mr_trash, pro_trash, gwyn_trash) |> 
+  mutate(cigarette_butts = as.integer(round(cigarette_butts)))
 ```
 
-
+The trash collection dataset combines records from multiple trash wheels, including Mr. Trash Wheel, Professor Trash Wheel, and Gwynns Falls Trash Wheel spanning from 2014 to 2025. The resulting dataset contains `r nrow(mr_trash)` observations and 15 variables, such as `dumpster` (the dumpster ID), `weight_tons` (weight of trash collected), `cigarette_butts`, `plastic_bottles`, `sports_balls`, `volume_cubic_yards`, `homes_powered` and `trash_wheel` indicating which trash wheel sites is that line of data from. These variables provide types and quantities of waste collected on each date and sites. For example, the total weight of trash collected by Professor Trash Wheel was `r sum(all_trash$weight_tons[all_trash$trash_wheel == "Professor Trash Wheel"], na.rm = TRUE)` tons. The total number of cigarette butts collected by Gwynnda in June of 2022 was `r sum(all_trash$cigarette_butts[all_trash$trash_wheel == "Gwynnda" & all_trash$month == "June" & all_trash$year == 2022], na.rm = TRUE)`. This dataset allows for detailed exploration of waste composition across different trash wheels and at different time periods.
 
 
