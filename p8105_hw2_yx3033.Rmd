@@ -29,7 +29,7 @@ pols_df =
 
 clean snv dataset
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 snv_df =
   read_csv("data/snp.csv") |> 
   janitor::clean_names() |> 
@@ -42,5 +42,21 @@ snv_df =
   mutate(month = month.name[month]) |> 
   select(year, month, close) |> 
   arrange(year, match(month, month.name))
+```
+
+clean unemployment data set
+```{r message=FALSE, warning=FALSE}
+unemp_df =
+  read_csv("data/unemployment.csv") |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    cols = jan:dec,
+    names_to = "month",
+    values_to = "unemployment"
+  ) |> 
+  mutate(
+    month = tools::toTitleCase(month)
+  ) |> 
+  select(year, month, unemployment)
 ```
 
