@@ -1,7 +1,7 @@
 ---
 title: "p8105_hw2_yx3033"
-Author: Yvonne Xie
-Data: 2025-10-01
+Author: "Yvonne Xie"
+Data: "2025-10-01"
 output: github_document
 ---
 
@@ -25,6 +25,7 @@ pols_df =
   mutate(month=month.name[month]) |> 
   mutate(president=if_else(prez_gop==1,"gop","dem")) |> 
   select(-prez_dem,-prez_gop,-day)
+pols_df
 ```
 
 clean snv dataset
@@ -42,6 +43,7 @@ snv_df =
   mutate(month = month.name[month]) |> 
   select(year, month, close) |> 
   arrange(year, match(month, month.name))
+snv_df
 ```
 
 clean unemployment data set
@@ -55,8 +57,9 @@ unemp_df =
     values_to = "unemployment"
   ) |> 
   mutate(
-    month = tools::toTitleCase(month)
+    month = month.name[match(tolower(month), tolower(month.abb))]
   ) |> 
   select(year, month, unemployment)
+unemp_df
 ```
 
