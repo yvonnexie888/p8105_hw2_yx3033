@@ -132,14 +132,19 @@ zip_codes=
   janitor::clean_names()
 ```
 
+deleated 'county' after county Bronx
 ```{r}
 zip_zori =
   read_csv("data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv") |> 
-  janitor::clean_names() 
-zip_zori$county_name <- gsub("county", "", zip_zori$county_name, ignore.case = TRUE)
-zip_zori$county_name <- trimws(zip_zori$county_name)
+  janitor::clean_names() |> 
+  mutate(
+    county_name = str_remove_all(county_name,"County"),
+    county_name = trimws(county_name),
+    region_name = as.character(region_name)
+  )
 ```
 
+i want to check what are the unique thing to match them and merge by creating a subset
 ```{r}
 bronx <- subset(zip_codes, zip_codes$county == "Bronx")
 table(bronx$zip_code)
@@ -163,7 +168,7 @@ zip_zori[duplicated(zip_zori$region_name) | duplicated(zip_zori$region_name, fro
 zori_augmented <- merge(
   zip_zori,
   zip_codes,
-   by.x = c("region_name", "county_name"),
+  by.x = c("region_name", "county_name"),
   by.y = c("zip_code", "county"),
   all.x = TRUE
 )
