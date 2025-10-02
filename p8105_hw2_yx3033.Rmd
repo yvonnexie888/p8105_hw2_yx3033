@@ -192,6 +192,9 @@ final_dataset = zori_tidy |>
 arrange by importance
 ```{r}
 final_dataset = final_dataset  |> 
+  
+  mutate(zip_code = region_name,
+         borough = county_name) |> 
   select(
     zip_code, 
     borough, 
@@ -201,5 +204,17 @@ final_dataset = final_dataset  |>
   ) |> 
   arrange(borough, neighborhood, date)
 
+```
+
+total observation, unique zip and neighborhoods
+```{r}
+total_obs <- nrow(final_dataset)
+cat("Total observations:", total_obs, "\n")
+
+unique_zips <- n_distinct(final_dataset$zip_code)
+cat("Unique ZIP codes:", unique_zips, "\n")
+
+unique_neighborhoods <- n_distinct(final_dataset$neighborhood)
+cat("Unique neighborhoods:", unique_neighborhoods, "\n")
 ```
 
