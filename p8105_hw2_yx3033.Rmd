@@ -180,3 +180,26 @@ zori_tidy = zip_zori |>
   select(-region_type,-state_name
   )
 ```
+
+merge two
+```{r}
+final_dataset = zori_tidy |> 
+  left_join(
+    zip_codes, 
+    by = c("region_name" = "zip_code", "county_name" = "county")
+  )
+```
+arrange by importance
+```{r}
+final_dataset = final_dataset  |> 
+  select(
+    zip_code, 
+    borough, 
+    neighborhood, date, rent_index,
+    city, metro, state, size_rank, 
+    everything()
+  ) |> 
+  arrange(borough, neighborhood, date)
+
+```
+
