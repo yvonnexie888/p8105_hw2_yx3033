@@ -129,7 +129,8 @@ The trash collection dataset combines records from multiple trash wheels, includ
 ```{r}
 zip_codes=
   read_csv("data/Zip Codes.csv") |> 
-  janitor::clean_names()
+  janitor::clean_names() |> 
+  mutate(zip_code = as.character(zip_code))
 ```
 
 deleated 'county' after county Bronx
@@ -140,37 +141,42 @@ zip_zori =
   mutate(
     county_name = str_remove_all(county_name,"County"),
     county_name = trimws(county_name),
-    region_name = as.character(region_name)
+    region_name = as.character(region_name),
+  ) |> 
+  rename_with(~ str_remove(.x, "^x"))
+```
+
+check for duplicates in the zip_codes dataset
+```{r}
+zip_codes_dupes = zip_codes |> 
+  group_by(zip_code)  |> 
+  filter(n() > 1)  |> 
+  ungroup()
+zip_codes_dupes
+
+zip_zori_dupes = zip_zori |> 
+  group_by(region_name)  |> 
+  filter(n() > 1)  |> 
+  ungroup()
+zip_zori_dupes
+
+cat("Duplicate zip codes found:", nrow(zip_codes_dupes), "\n")
+cat("Duplicate region_names found:", nrow(zip_zori_dupes), "\n")
+
+#ZIP 10463 appears in both Bronx County and New York County (Manhattan)
+#ZIP 11201 appears in both Kings County (Brooklyn) and New York County (Manhattan)
+```
+
+
+```{r}
+
+zori_tidy = zip_zori |> 
+  pivot_longer(
+    cols = `2015_01_31`:`2024_08_31`,
+    names_to = "date",
+    values_to = "rent_index") |>
+  mutate(date = lubridate::ymd(date)) |> 
+  filter(!is.na(rent_index)) |> 
+  select(-region_type,-state_name
   )
 ```
-
-i want to check what are the unique thing to match them and merge by creating a subset
-```{r}
-bronx <- subset(zip_codes, zip_codes$county == "Bronx")
-table(bronx$zip_code)
-
-```
-
-
-```{r}
-zip_zori$region_name <- as.character(zip_zori$region_name)
-zip_codes$zip_code <- as.character(zip_codes$zip_code)
-```
-
-```{r}
-# Check duplicates in zip_codes
-zip_codes[duplicated(zip_codes$zip_code) | duplicated(zip_codes$zip_code, fromLast = TRUE), ]
-
-# Check duplicates in zip_zori
-zip_zori[duplicated(zip_zori$region_name) | duplicated(zip_zori$region_name, fromLast = TRUE), ]
-
-
-zori_augmented <- merge(
-  zip_zori,
-  zip_codes,
-  by.x = c("region_name", "county_name"),
-  by.y = c("zip_code", "county"),
-  all.x = TRUE
-)
-```
-
