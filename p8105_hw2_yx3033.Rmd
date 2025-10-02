@@ -225,7 +225,7 @@ missing_in_zori =
   anti_join(zip_zori, by = c("zip_code" = "region_name"))  |> 
   distinct(zip_code,county, neighborhood)
 cat("ZIP codes in zip code data but missing from Zillow Rental Price dataset:\n")
-print(missing_in_zori)
+missing_in_zori
 ```
 
 ```{r}
@@ -236,7 +236,49 @@ missing_by_borough = missing_in_zori |>
     example_zips = paste(head(zip_code, 3), collapse = ", "),
     .groups = 'drop'
   )
-print(missing_by_borough)
+missing_by_borough
 ```
 The analysis reveals that 171 ZIP codes from the neighborhood dataset are missing from the Zillow rental data, with Manhattan showing the highest number of exclusions (102 ZIP codes), followed by Queens (44), Kings (11), Bronx (8), and Richmond (6). One of the reason that there are so many in Manhattan (New York County) is that for example ZIP code 10008 in Manhattan's Financial District is primarily composed of office buildings, skyscrapers, and commercial spaces with very few residential rental properties. Zillow likely excludes such areas because very few buildings there are in residential rental markets.
 
+
+Price comparison
+```{r}
+january_comparison = 
+  final_dataset |> 
+  filter((lubridate::year(date) == 2020 & lubridate::month(date) == 1) | 
+         (lubridate::year(date) == 2021 & lubridate::month(date) == 1)) |> 
+  select(zip_code, borough, neighborhood, date, rent_index)  |> 
+  pivot_wider(
+    names_from = date,
+    values_from = rent_index,
+    names_prefix = "jan_"
+  )  |> 
+  filter(!is.na(`jan_2020-01-31`) & !is.na(`jan_2021-01-31`)) |> 
+  mutate(
+    price_change = `jan_2021-01-31` - `jan_2020-01-31`,
+    percent_change = (`jan_2021-01-31` - `jan_2020-01-31`) / `jan_2020-01-31` * 100
+  )
+
+
+largest_drops= 
+  january_comparison |> 
+  arrange(price_change)  |> 
+  head(10)  |> 
+  select(
+    zip_code, 
+    borough, 
+    neighborhood, 
+    jan_2020_price = `jan_2020-01-31`,
+    jan_2021_price = `jan_2021-01-31`, 
+    price_drop = price_change,
+    percent_drop = percent_change
+  ) |> 
+  mutate(
+    price_drop = round(price_drop, 2),
+    percent_drop = round(percent_drop, 1)
+  )
+
+largest_drops
+```
+
+Based on the table, the largest drop heavily concentrated in New York county (Manhattan), which likely reflects that people are moving out of the city during the pandemic and working remote from home. The top 10 ZIP codes experienced dramatic declines of **`r round(min(largest_drops$percent_drop), 1)`% to `r round(max(largest_drops$percent_drop), 1)`%**, representing substantial financial impacts for property owners in these areas.
